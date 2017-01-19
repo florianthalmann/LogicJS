@@ -79,7 +79,11 @@ Domain.prototype.div = function(d2) {
 }
 
 function make_domain(min, max) {
-	return new Domain(min, max)
+	return new Domain(fixFloatError(min), fixFloatError(max))
+}
+
+function fixFloatError(f) {
+	return Math.round(f * 10000000000000) / 10000000000000;
 }
 
 function intersection(d1, d2) {
@@ -103,7 +107,7 @@ function get_domain(pack, x) {
 }
 
 /*
-	constraints	
+	constraints
 
 */
 
@@ -119,7 +123,7 @@ Constraint.prototype.toString = function() {
 }
 
 //calls constraint
-//c->proc takes a package and returns a modified package or false 
+//c->proc takes a package and returns a modified package or false
 Constraint.prototype.proc = function(p) {
 	var f = this.fn.apply(null, this.args)
 	return f(p)
@@ -138,7 +142,7 @@ function run_constraints(store, p0) {
 	while(!cs.is_empty()) {
 		var c = cs.first
 		p = c.proc(p)
-		if(p===false) 
+		if(p===false)
 			return false
 		cs = cs.rest
 	}
@@ -147,9 +151,9 @@ function run_constraints(store, p0) {
 
 /*
 	clp for reals
-	
+
 	The clp operations (such +-/* and <=, <, >, >=, !=, dom) create a binding of a variable to a domain, which is added to package->domains after checking for consistency. When eq creates a new binding, we check the variable's domain (if any) for consistency before extending package->frame.
-	
+
 */
 
 function less_equal_c(x,y) {
@@ -293,9 +297,9 @@ List.prototype = {
 	}
 	,append : function (s2) {
 		var s1 = this
-		if (s1.is_empty()) 
+		if (s1.is_empty())
 			return s2
-		else 
+		else
 			return logic.make_list(s1.first, s1.append(s2));
 	}
 	,interleave : function (s2) {
@@ -524,7 +528,7 @@ Stream.prototype = {
 	}
 	,append : function (s2) {
 		var s1 = this
-		if (s1.is_empty()) 
+		if (s1.is_empty())
 			return s2
 		else
 			return logic.make_stream(s1.first, function() { return s1.rest().append(s2); });
@@ -534,7 +538,7 @@ Stream.prototype = {
 		if (s1.is_empty())
 			return s2
 		else
-			return logic.make_stream(s1.first, function() { 
+			return logic.make_stream(s1.first, function() {
 				return s2.interleave(s1.rest());
 			});
 	}
@@ -619,7 +623,7 @@ logic.is_object = function (v) {
 }
 
 logic.lvar = function (name) { //name is optional (for debugging)
-	return {type : 'logic_var', name : name} 
+	return {type : 'logic_var', name : name}
 }
 
 logic.list = function () {
@@ -662,7 +666,7 @@ logic.unify = function (a, b, frame) {
 	else if(logic.is_lvar(a)) //is variable
 		return frame.extend(logic.make_binding(a,b))
 	else if(logic.is_lvar(b)) //is variable
-		return frame.extend(logic.make_binding(b,a)) 
+		return frame.extend(logic.make_binding(b,a))
 	else if(logic.is_logic_list(a) && logic.is_logic_list(b)) { //are both lists
 		//match two arrays
 		if(a.length!==b.length) return false;
@@ -686,7 +690,7 @@ logic.eq = function (a, b) { //'goal' version of unify
 			//if(f!=f2 && !p.domains.is_empty() && (!intersection(get_domain(p, a), get_domain(p, b)))) //take care of constraints
 				//return logic.fail()
 			var p2 = p.set_frame(f2)
-			if(f==f2 || p.store.is_empty()) 
+			if(f==f2 || p.store.is_empty())
 				return logic.win(p2)
 			//check constraints first
 			var p3 = run_constraints(p2.store, p2)
@@ -695,7 +699,7 @@ logic.eq = function (a, b) { //'goal' version of unify
 			else
 				return logic.fail()
 		}
-		else 
+		else
 			return logic.fail()
 	}
 }
@@ -714,7 +718,7 @@ logic.disj = function (g1, g2) {
 }
 logic.or = function() {
 	args = Array.prototype.slice.call(arguments)
-	if(args.length===0) 
+	if(args.length===0)
 		return logic.fail
 	if(args.length===1)
 		return args[0]
@@ -733,7 +737,7 @@ logic.conj = function (g1, g2) {
 }
 logic.and = function() {
 	args = Array.prototype.slice.call(arguments)
-	if(args.length===0) 
+	if(args.length===0)
 		return logic.win
 	if(args.length===1)
 		return args[0]
@@ -758,7 +762,7 @@ logic.implies = function (g1,g2,g3) { //g1 -> g2 ; g3
 */
 
 var _between = function (a,b,x) {
-	if(a>b) 
+	if(a>b)
 		return logic.fail
 	else
 		return logic.disj(logic.eq(x,a), logic.between(a+1,b,x))
@@ -806,7 +810,7 @@ if (typeof exports !== 'undefined') {
 	  exports = module.exports = logic;
 	}
 	exports.logic = logic;
-} 
+}
 else {
 	this.logic = logic;
 }
