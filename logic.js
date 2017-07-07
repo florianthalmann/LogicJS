@@ -397,8 +397,8 @@ Package.prototype.lookup_domain_binding = function (variable) {
 	return this.lookup_binding_helper(this.domains, variable)
 }
 
-Package.prototype.is_empty = function (arguments) {
-	return this.frame.is_empty(arguments)
+Package.prototype.is_empty = function (args) {
+	return this.frame.is_empty(args)
 }
 
 Package.prototype.set_frame = function (f) {
@@ -431,8 +431,8 @@ Package.prototype.extend_constraint = function (c) {
 	return logic.make_package(this.frame, this.store.extend(c), this.domains)
 }
 
-Package.prototype.extend = function (arguments) {
-	return logic.make_package(this.frame.extend(arguments), this.store, this.domains)
+Package.prototype.extend = function (args) {
+	return logic.make_package(this.frame.extend(args), this.store, this.domains)
 }
 
 Package.prototype.toString = function() {
@@ -627,7 +627,7 @@ logic.lvar = function (name) { //name is optional (for debugging)
 }
 
 logic.list = function () {
-	var l = Array.prototype.slice.call(arguments)
+	var l = Array.prototype.slice.call(args)
 	l.type = 'logic_list'
 	return l
 }
